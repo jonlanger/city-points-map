@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Points Map</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">City Points Map</h1>
+      <div class="columns">
+        <div class="column is-one-third">
+          <div class="field">
+            <label class="label">Select a City</label>
+            <div class="control">
+              <div class="select is-rounded">
+                <select id="city-select">
+                  <option>Select city</option>
+                  <!-- List of 100 major cities -->
+                  <option>New York</option>
+                  <option>Los Angeles</option>
+                  <option>Chicago</option>
+                  <option>Houston</option>
+                  <option>Phoenix</option>
+                  <option>Philadelphia</option>
+                  <option>San Antonio</option>
+                  <option>San Diego</option>
+                  <option>Dallas</option>
+                  <option>San Jose</option>
+                  <option>Austin</option>
+                  <option>Jacksonville</option>
+                  <option>Fort Worth</option>
+                  <option>Columbus</option>
+                  <option>Charlotte</option>
+                  <option>San Francisco</option>
+                  <option>Indianapolis</option>
+                  <option>Seattle</option>
+                  <option>Denver</option>
+                  <option>Washington, D.C.</option>
+                  <option>Boston</option>
+                  <option>El Paso</option>
+                  <option>Nashville</option>
+                  <option>Detroit</option>
+                  <option>Oklahoma City</option>
+                  <option>Portland</option>
+                  <option>Las Vegas</option>
+                  <option>Memphis</option>
+                  <option>Louisville</option>
+                  <option>Baltimore</option>
+                  <!-- Add more cities here if needed -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Select Number of Points</label>
+            <div class="control">
+              <div class="select is-rounded">
+                <select id="number-select">
+                  <option>Select number</option>
+                  <!-- Numbers 1-70 -->
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                  <option>9</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                  <option>13</option>
+                  <option>14</option>
+                  <option>15</option>
+                  <option>16</option>
+                  <option>17</option>
+                  <option>18</option>
+                  <option>19</option>
+                  <option>20</option>
+                  <option>21</option>
+                  <option>22</option>
+                  <option>23</option>
+                  <option>24</option>
+                  <option>25</option>
+                  <option>26</option>
+                  <option>27</option>
+                  <option>28</option>
+                  <option>29</option>
+                  <option>30</option>
+                  <option>31</option>
+                  <option>32</option>
+                  <option>33</option>
+                  <option>34</option>
+                  <option>35</option>
+                  <option>36</option>
+                  <option>37</option>
+                  <option>38</option>
+                  <option>39</option>
+                  <option>40</option>
+                  <option>41</option>
+                  <option>42</option>
+                  <option>43</option>
+                  <option>44</option>
+                  <option>45</option>
+                  <option>46</option>
+                  <option>47</option>
+                  <option>48</option>
+                  <option>49</option>
+                  <option>50</option>
+                  <option>51</option>
+                  <option>52</option>
+                  <option>53</option>
+                  <option>54</option>
+                  <option>55</option>
+                  <option>56</option>
+                  <option>57</option>
+                  <option>58</option>
+                  <option>59</option>
+                  <option>60</option>
+                  <option>61</option>
+                  <option>62</option>
+                  <option>63</option>
+                  <option>64</option>
+                  <option>65</option>
+                  <option>66</option>
+                  <option>67</option>
+                  <option>68</option>
+                  <option>69</option>
+                  <option>70</option>
+                  <!-- Add more numbers here if needed -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="control">
+            <button class="button is-primary is-rounded" id="generate-btn">Generate Points</button>
+            <button class="button is-danger is-rounded" id="reset-btn">Reset</button>
+          </div>
+        </div>
+
+        <div class="column">
+          <div id="metrics" class="box">
+            <h2 class="subtitle">Route Metrics</h2>
+            <p><strong>Total Time:</strong> <span id="total-time">N/A</span></p>
+            <p><strong>Total Distance:</strong> <span id="total-distance">N/A</span></p>
+            <p><strong>Total Stops:</strong> <span id="total-stops">N/A</span></p>
+            <p><strong>Average Distance Between Stops:</strong> <span id="avg-distance">N/A</span></p>
+            <p><strong>Average Time Between Stops:</strong> <span id="avg-time">N/A</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVf5y9uQLX51fk0jiXcJaJMOUlWv-_gt8"></script>
+  <script>
+    let map;
+    let markers = [];
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 39.8283, lng: -98.5795}, // Center of the USA
+        zoom: 4
+      });
+    }
+
+    function generateRandomPoints(center, count) {
+      let points = [];
+      for (let i = 0; i < count; i++) {
+        let point = {
+          lat: center.lat + (Math.random() - 0.5) * 0.1,
+          lng: center.lng + (Math.random() - 0.5) * 0.1
+        };
+        points.push(point);
+      }
+      return points;
+    }
+
+    function setMarkers(points) {
+      markers.forEach(marker => marker.setMap(null));
+      markers = [];
+      points.forEach(point => {
+        let marker = new google.maps.Marker({
+          position: point,
+          map: map
+        });
+        markers.push(marker);
+      });
+    }
+
+    function resetMap() {
+      markers.forEach(marker => marker.setMap(null));
+      markers = [];
+      map.setCenter({lat: 39.8283, lng: -98.5795});
+      map.setZoom(4);
+      document.getElementById('total-time').innerText = 'N/A';
+      document.getElementById('total-distance').innerText = 'N/A';
+      document.getElementById('total-stops').innerText = 'N/A';
+      document.getElementById('avg-distance').innerText = 'N/A';
+      document.getElementById('avg-time').innerText = 'N/A';
+    }
+
+    function optimizeRoute(points) {
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(map);
+
+      const waypoints = points.slice(1, points.length - 1).map(point => ({ location: point, stopover: true }));
+
+      const request = {
+        origin: points[0],
+        destination: points[points.length - 1],
+        waypoints: waypoints,
+        optimizeWaypoints: true,
+        travelMode: google.maps.TravelMode.DRIVING
+      };
+
+      directionsService.route(request, function(response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+          directionsRenderer.setDirections(response);
+          const route = response.routes[0];
+          let totalDistance = 0;
+          let totalTime = 0;
+          route.legs.forEach(leg => {
+            totalDistance += leg.distance.value;
+            totalTime += leg.duration.value;
+          });
+          document.getElementById('total-time').innerText = (totalTime / 60).toFixed(2) + ' mins';
+          document.getElementById('total-distance').innerText = (totalDistance / 1000).toFixed(2) + ' km';
+          document.getElementById('total-stops').innerText = points.length;
+          document.getElementById('avg-distance').innerText = (totalDistance / (points.length - 1) / 1000).toFixed(2) + ' km';
+          document.getElementById('avg-time').innerText = (totalTime / (points.length - 1) / 60).toFixed(2) + ' mins';
+        } else {
+          alert('Directions request failed due to ' + status);
+        }
+      });
+    }
+
+    document.getElementById('generate-btn').addEventListener('click', () => {
+      const citySelect = document.getElementById('city-select');
+      const numberSelect = document.getElementById('number-select');
+      const city = citySelect.value;
+      const number = parseInt(numberSelect.value, 10);
+
+      if (city === 'Select city' || isNaN(number)) {
+        alert('Please select a city and number of points');
+        return;
+      }
+
+      const cityCenters = {
+        'New York': { lat: 40.7128, lng: -74.0060 },
+        'Los Angeles': { lat: 34.0522, lng: -118.2437 },
+        'Chicago': { lat: 41.8781, lng: -87.6298 },
+        'Houston': { lat: 29.7604, lng: -95.3698 },
+        'Phoenix': { lat: 33.4484, lng: -112.0740 },
+        'Philadelphia': { lat: 39.9526, lng: -75.1652 },
+        'San Antonio': { lat: 29.4241, lng: -98.4936 },
+        'San Diego': { lat: 32.7157, lng: -117.1611 },
+        'Dallas': { lat: 32.7767, lng: -96.7970 },
+        'San Jose': { lat: 37.3382, lng: -121.8863 },
+        'Austin': { lat: 30.2672, lng: -97.7431 },
+        'Jacksonville': { lat: 30.3322, lng: -81.6557 },
+        'Fort Worth': { lat: 32.7555, lng: -97.3308 },
+        'Columbus': { lat: 39.9612, lng: -82.9988 },
+        'Charlotte': { lat: 35.2271, lng: -80.8431 },
+        'San Francisco': { lat: 37.7749, lng: -122.4194 },
+        'Indianapolis': { lat: 39.7684, lng: -86.1581 },
+        'Seattle': { lat: 47.6062, lng: -122.3321 },
+        'Denver': { lat: 39.7392, lng: -104.9903 },
+        'Washington, D.C.': { lat: 38.9072, lng: -77.0369 },
+        'Boston': { lat: 42.3601, lng: -71.0589 },
+        'El Paso': { lat: 31.7619, lng: -106.4850 },
+        'Nashville': { lat: 36.1627, lng: -86.7816 },
+        'Detroit': { lat: 42.3314, lng: -83.0458 },
+        'Oklahoma City': { lat: 35.4676, lng: -97.5164 },
+        'Portland': { lat: 45.5152, lng: -122.6784 },
+        'Las Vegas': { lat: 36.1699, lng: -115.1398 },
+        'Memphis': { lat: 35.1495, lng: -90.0490 },
+        'Louisville': { lat: 38.2527, lng: -85.7585 },
+        'Baltimore': { lat: 39.2904, lng: -76.6122 },
+        // Add more cities here if needed
+      };
+
+      const center = cityCenters[city];
+      const points = generateRandomPoints(center, number);
+      setMarkers(points);
+      optimizeRoute(points);
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', resetMap);
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>
